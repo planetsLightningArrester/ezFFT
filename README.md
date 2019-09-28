@@ -1,7 +1,5 @@
 # ezFFT - Node JS
-OMGGG THAT'S FREAKING HARD TO FIND A EASY WAY TO FFT A SIMPLE ARRAY!!1! GOSH I GUESS FFT STANDS FOR FREAKING FUCKING TOUGH
-
-hold my coffee
+Easy as fun
 
 ```Javascript
 let fft = require('ezfft').fft;
@@ -9,8 +7,6 @@ let fft = require('ezfft').fft;
 [amplitude, frequency] = fft(signal, fs);    //OMG ITS EZ AS F*
 
 ```
-
-NO WAY ARE U SERIOUS? TELL ME MORE
 
 ### Usage
 ```Javascript
