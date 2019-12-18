@@ -41,8 +41,8 @@ function fft (signal, fs, imagPart = 0) {
         },
         //Frequency domain data
         frequency:{
-			realPart: [],
-			imagPart: [],
+			realPart: [],		//FFT real part
+			imagPart: [],		//FFT imaginay part
             amplitude: [],      //Amplitude module
             phase: [],          //Phase [rad/s]
             frequency: []       //Frequency axis
@@ -64,7 +64,7 @@ function fft (signal, fs, imagPart = 0) {
             data.time.time[i] = i/fs;
         }
         
-        //Make imaginary part equal to zero if it doesn't exist
+        //Make imaginary part equal to zero if the argument is not passed
         if (data.time.imagPart.length != data.time.realPart.length) {
             data.time.imagPart = newArrayOfZeros(data.time.realPart.length);
         }
@@ -75,25 +75,23 @@ function fft (signal, fs, imagPart = 0) {
     let auxImag = data.time.imagPart.map(function(num){return num;});
 
     //Calculate the Fourier Transform (calculated from 0 to fs)
-    [data.frequency.amplitude, data.frequency.phase] = transform(auxReal, auxImag);
+    [data.frequency.realPart, data.frequency.imagPart] = transform(auxReal, auxImag);
 
     //Normalizes data
-    for (let i = 0; i < data.frequency.amplitude.length; i++) {
-        //Take amplitude module
-        data.frequency.amplitude[i] = Math.sqrt(Math.pow(data.frequency.amplitude[i], 2) + Math.pow(data.frequency.phase[i], 2)) / (data.frequency.amplitude.length / 2);
-        //Phase is given in phase/pi. So, it's multiplied by pi and normalized.
-        data.frequency.phase[i] = Math.PI * data.frequency.phase[i] / data.frequency.amplitude.length; //[rad/s]
+    for (let i = 0; i < data.frequency.realPart.length; i++) {
+        //Take FFT amplitude module
+        data.frequency.amplitude[i] = Math.sqrt(Math.pow(data.frequency.realPart[i], 2) + Math.pow(data.frequency.imagPart[i], 2)) / (data.frequency.realPart.length / 2);
+		
+		//Take the FFT phase
+        data.frequency.phase[i] = Math.atan2(data.frequency.imagPart[i], data.frequency.realPart[i]); //[rad/s]
+		
         //Create frequency axis
         data.frequency.frequency[i] = i / data.samplingTime;
 
-        //Remove amplitude values under 10^-3
+        //Remove amplitude values under 10^-3 and, thus, it's respective phase values
         if(data.frequency.amplitude[i] < 1e-3) {
-            data.frequency.amplitude[i] = 0;
-        }
-
-        //Remove phase values under 10^-3
-        if(Math.abs(data.frequency.phase[i]) < 1e-3) {
-            data.frequency.phase[i] = 0;
+			data.frequency.amplitude[i] = 0;
+			data.frequency.phase[i] = 0;
         }
     }
 
@@ -119,7 +117,6 @@ function fft (signal, fs, imagPart = 0) {
         data.frequency.frequency.pop();
     });
     
-    // console.log(data);
     return data;
 }
 
