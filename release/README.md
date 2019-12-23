@@ -2,8 +2,8 @@
 Easy as fun
 
 ```Javascript
-let fft = require("./ezfft").fft;
-let ifft = require("./ezfft").ifft;
+let fft = require("ezfft").fft;
+let ifft = require("ezfft").ifft;
 ...
 let data = fft(signal, fs);    //OMG ITS EZ AS F*
 console.log(data.frequency.amplitude);  //Amplitude axis
