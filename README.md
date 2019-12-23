@@ -2,28 +2,52 @@
 Easy as fun
 
 ```Javascript
-let fft = require('ezfft').fft;
+let fft = require("./ezfft").fft;
+let ifft = require("./ezfft").ifft;
 ...
-[amplitude, frequency] = fft(signal, fs);    //OMG ITS EZ AS F*
+let data = fft(signal, fs);    //OMG ITS EZ AS F*
+console.log(data.frequency.amplitude);  //Amplitude axis
+console.log(data.frequency.phase);      //Phase axis
+console.log(data.frequency.frequency);  //Frequency axis
+```
+Whereas ```data``` has the following properties.
 
+```Javascript
+data = {
+    //Time domain data
+    time: {
+        realPart: []    //Real part
+        imagPart: []    //Imaginay part
+        time: []        //Time axis
+    },
+    //Frequency domain data
+    frequency:{
+        realPart: [],	//FFT real part
+        imagPart: [],	//FFT imaginay part
+        amplitude: [],  //Amplitude module
+        phase: [],      //Phase [rad]
+        frequency: []   //Frequency axis [Hz]
+    },
+    fs: fs,             //Sample rate in Hz
+    samplingTime: st    //Sampling time in seconds
+}
 ```
 
 ### Usage
 ```Javascript
 let fft = require('ezfft').fft;
+let ifft = require('ezfft').ifft;
 
 let signal = [];    //My awesome signal
 let fs = 1000;      //My awesome sample rate
 
 let f = 20;         //Yours signal awesome frequency
-for(let t = 0; t < 1; t += 1/fs){
+for(let t = 0; t < 1; t += 1/fs) {
     signal.push(3*Math.sin(2*Math.PI*f*t));   //Let's make some sin ;-) (oh yeah go with it)
 }
 
-let amplitude = [];     //Array with the Y axis (amplitude)
-let frequency = [];     //Array with the X axis (frequency)
-
-[amplitude, frequency] = fft(signal, fs);    //OMG ITS EZ AS F*
+let data = fft(signal, fs);    //Returns the whole signal with frequency and time domain axis
+data = ifft(data.frequency.amplitude, data.frequency.frequency); //Get the time from frequency domain
 
 ```
 
@@ -32,16 +56,27 @@ HELL YEAH! So easy. If you want a easy way to plot your data in the browser, go 
 ### Install
 `npm i ezfft`
 
-### TODO
-IFFT not implemented yet cuz I'm dumb
-
-### Parameters
+### FFT
++ **fft (signal, fs, imagPart = 0, ignoreFftAmplitudesLowerThan = 1e-3)**
 + **Input**
-- *signal:* Time signal
-- *fs:* Sample frequency (Hz)
+- *signal:* Time signal [Array]
+- *fs:* Sample frequency (Hz) [Array]
+- [Optional] *imagPart:* Imaginary part of the signal (if any) [Array]
+- [Optional] *ignoreFftAmplitudesLowerThan:* Threshold to make fft value equals to zero [Value]
 + **Output**
-- *amplitude:* Amplitude of each frequency
-- *frequency:* Frequency of each amplitude (Hz)
+- *data:* Data object [Object]
+
+### IFFT
++ **ifft(amplitude, frequency, phase = 0, fftRealPart = 0, fftImagPart = 0, ignoreImagAmplitudesLowerThan = 1e-3)**
++ **Input**
+- *amplitude:* Amplitude axis [Array]
+- *frequency:* Frequency axis (Hz) [Array]
+- [Optional] *phase:* Phase axis (if any) [Array]
+- [Optional] *fftRealPart:* Real part of FFT (overrides the parameters *amplitude* and *phase*) [Array]
+- [Optional] *fftImagPart:* Imaginary part of FFT (overrides the parameters *amplitude* and *phase*) [Array]
+- [Optional] *ignoreImagAmplitudesLowerThan:* Threshold to make imag value equals to zero [Value]
++ **Output**
+- *data:* Data object [Object]
 
 ### Plot your data with express and socket.io in 3 steps (Bonus)
 Install `express`
@@ -72,7 +107,7 @@ Create a `index.html`. You can change the your graph size below.
                 label: "Time (s)",
                 labels: [1, 2, 3, 4],
                 datasets: [{
-                    label: "Acceleration (mg)",
+                    label: "Signal (Unit)",
                     fill: false,
                     borderColor: 'rgba(255, 99, 132, 1)',
                     data: [12, 9, 13, 13]
@@ -134,14 +169,12 @@ Create a `index.html`. You can change the your graph size below.
 
         let socket = io('http://localhost:8013');
 
-        socket.on("time", function(data, _time){
-            time.data.labels = _time;
-            time.data.datasets[0].data = data;
+        socket.on("data", function(data, _time){
+            time.data.labels = data.time.time;
+            time.data.datasets[0].data = data.time.realPart;
+            fft.data.labels = data.frequency.frequency;
+            fft.data.datasets[0].data = data.frequency.amplitude;
             time.update();
-        });
-        socket.on("fft", function(data, frequency){
-            fft.data.labels = frequency;
-            fft.data.datasets[0].data = data;
             fft.update();
         });
     </script>
@@ -180,29 +213,26 @@ var io = require('socket.io')(http);
 /*Socket configuration*/
 io.on('connection', function (socket) {
     
-    console.log("LETS START");
+    console.log("LESGO");
 
     setInterval(function () {
         let signal = [];        //Array with the Y axis (amplitude in time)
         let time = [];          //Array with the X axis (time)
 
-        let amplitude = [];     //Array with the Y axis (amplitude in frequency)
-        let frequency = [];     //Array with the X axis (frequency)
+        let data;
         
-        let f =60;              //Your signal frequency
+        let f = 60;              //Your signal frequency
         let fs = 1000;          //Your sample rate
         let samplingTime = 1;   //Period that the signal was sampled
 
         for(let t = 0; t < samplingTime; t += 1/fs){
-            signal.push(180*Math.sin(2*Math.PI*f*t) + 20*Math.sin(2*Math.PI*2*f*t) + 2*Math.sin(2*Math.PI*3*f*t));  //My generated signal
-            time.push(t);
+            signal.push(180*Math.sin(2*Math.PI*f*t) + 20*Math.sin(2*Math.PI*2*f*t) + 2*Math.sin(2*Math.PI*3*f*t));  //The generated signal
+            time.push(t);                  //Append time axis
         }
 
-        socket.emit("time", signal, time);      //Send time signal to the Browser
-
-        [amplitude, frequency] = fft(signal, fs);   //Get FFT of the signal
+        data = fft(signal, fs);   //Get FFT of the signal
         
-        socket.emit("fft", amplitude, frequency);   //Send FFT signal to the Browser
+        socket.emit("data", data);   //Send data to the Browser
 
     }, 2000);       //Update rate in sec
 });
@@ -210,7 +240,7 @@ io.on('connection', function (socket) {
 ```
 
 ### LICENSE
-It all is just a wrap to Project Nayuki. (MIT License)
+It all is just a wrap to Project Nayuki (MIT License). Thank you so much for doing this in many languages including JS.
 `https://www.nayuki.io/page/free-small-fft-in-multiple-languages`
 
 Free FFT and convolution (JavaScript)

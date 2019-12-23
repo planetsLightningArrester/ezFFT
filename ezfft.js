@@ -26,10 +26,13 @@ module.exports = {
 };
 
 /* 
- * Wrapper of wrapper fft function
+ * Wrapper of wrapper fft function where:
+ * - signal [vector]: is the aquired signal in time (or the real part)
+ * - fs [number]: is the sample rate [Hz]
+ * - imagPart [vector]: is the imaginary part (if any) [optional]
  */
 
-function fft (signal, fs, imagPart = 0) {
+function fft (signal, fs, imagPart = 0, ignoreFftAmplitudesLowerThan = 1e-3) {
 
     //Create an object that contains all data about the signal
     data = {
@@ -44,11 +47,11 @@ function fft (signal, fs, imagPart = 0) {
 			realPart: [],		//FFT real part
 			imagPart: [],		//FFT imaginay part
             amplitude: [],      //Amplitude module
-            phase: [],          //Phase [rad/s]
+            phase: [],          //Phase [rad]
             frequency: []       //Frequency axis
         },
-        fs: fs,             //Sample rate
-        samplingTime: 0     //Sampling time
+        fs: fs,             //Sample rate in Hz
+        samplingTime: 0     //Sampling time in seconds
     }
 
     //Check if "fs" is not zero
@@ -70,26 +73,26 @@ function fft (signal, fs, imagPart = 0) {
         }
     }
 
-    //Auxiliaries variables for FFT processing
+    //Auxiliaries variables for FFT processing whitout address association
     let auxReal = data.time.realPart.map(function(num){return num;});
     let auxImag = data.time.imagPart.map(function(num){return num;});
 
     //Calculate the Fourier Transform (calculated from 0 to fs)
     [data.frequency.realPart, data.frequency.imagPart] = transform(auxReal, auxImag);
 
-    //Normalizes data
+    //Normalize data
     for (let i = 0; i < data.frequency.realPart.length; i++) {
         //Take FFT amplitude module
         data.frequency.amplitude[i] = Math.sqrt(Math.pow(data.frequency.realPart[i], 2) + Math.pow(data.frequency.imagPart[i], 2)) / (data.frequency.realPart.length / 2);
 		
 		//Take the FFT phase
-        data.frequency.phase[i] = Math.atan2(data.frequency.imagPart[i], data.frequency.realPart[i]); //[rad/s]
+        data.frequency.phase[i] = Math.atan2(data.frequency.imagPart[i], data.frequency.realPart[i]); //[rad]
 		
         //Create frequency axis
         data.frequency.frequency[i] = i / data.samplingTime;
 
-        //Remove amplitude values under 10^-3 and, thus, it's respective phase values
-        if(data.frequency.amplitude[i] < 1e-3) {
+        //Remove amplitude values under 10^-3 (default) and, thus, it's respective phase values
+        if(data.frequency.amplitude[i] < ignoreFftAmplitudesLowerThan) {
 			data.frequency.amplitude[i] = 0;
 			data.frequency.phase[i] = 0;
         }
@@ -115,22 +118,88 @@ function fft (signal, fs, imagPart = 0) {
     sortArrayAux.forEach(function(el){
         data.frequency.frequency.unshift(-(el - ((fs - 1)/2)));
         data.frequency.frequency.pop();
-    });
-    
+	});
+	
+	//Sampling time correction
+	data.samplingTime -= 1/fs;
+	
+	//Returns the whole thing
     return data;
 }
 
 /* 
  * Wrapper of wrapper ifft function
- */ //TODO
+ */
 
-function ifft(amplitude, frequency) {
-	// let re = [0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0];
-	// let im = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-	data.frequency.phase = data.frequency.phase.map(function(num){return (num/Math.PI)});
-	console.log(data.time.realPart);
-	inverseTransform(data.frequency.amplitude, data.frequency.phase);
-	console.log(data.frequency.amplitude.map(function(num){return num/2}));
+function ifft(amplitude, frequency, phase = 0, fftRealPart = 0, fftImagPart = 0, ignoreImagAmplitudesLowerThan = 1e-3) {
+	//Create an object that contains all data about the signal
+    data = {
+        //Time domain data
+        time: {
+            realPart: [],   //Real part
+            imagPart: [],	//Imaginay part
+            time: []		//Time axis
+        },
+        //Frequency domain data
+        frequency:{
+			realPart: [],				//FFT real part
+			imagPart: [],				//FFT imaginay part
+            amplitude: amplitude,		//Amplitude module
+            phase: [],					//Phase [rad]
+            frequency: frequency		//Frequency axis
+        },
+        fs: 0,             //Sample rate
+        samplingTime: 0    //Sampling time
+    }
+	
+	//Calculate the sampling time and the sample rate
+	data.samplingTime = 1/(Math.abs(frequency[1] - frequency[0]));
+	data.fs = 2*frequency.map(Math.abs).reduce(function(a,b){return Math.max(a,b)});
+
+	//Generate the time axis
+	for(let i = 0; i < data.samplingTime*data.fs; i++) {
+		data.time.time[i] = i/data.fs;
+	}
+
+	//If no phase has been passed
+	if(typeof phase.length == 'undefined') {
+		//Create an empty phase array
+		data.frequency.phase = newArrayOfZeros(amplitude.length);
+	} else {
+		//Otherwise store it
+		data.frequency.phase = phase;
+	}
+
+	//If no real and imaginay part has been passed
+	if(typeof fftRealPart.length == 'undefined' && typeof fftImagPart.length == 'undefined') {
+		//Calculate them
+		for (let i = 0 ; i < data.frequency.amplitude.length; i ++) {
+			data.frequency.realPart[i] = (data.frequency.amplitude[i] * data.frequency.amplitude.length)/(2*Math.sqrt(1 + Math.pow(Math.tan(data.frequency.phase[i]), 2)));
+			data.frequency.imagPart[i] = data.frequency.realPart[i]*Math.tan(data.frequency.phase[i]);
+		}
+	} else {
+		//Otherwise store it without address association
+		data.frequency.realPart = fftRealPart.map(function(num){return num;});
+		data.frequency.imagPart = fftImagPart.map(function(num){return num;});
+	}
+
+	//Auxiliaries variables for FFT processing whiout address association
+	let auxReal = data.frequency.realPart.map(function(num){return num;});
+	let auxImag = data.frequency.imagPart.map(function(num){return num;});
+
+	//Perform the inverse transform
+	[data.time.imagPart, data.time.realPart] = inverseTransform(auxReal, auxImag);
+
+	//Remove amplitude values under 10^-3 (default) and, thus, it's respective phase values
+	for (let i = 0; i < data.time.imagPart.length; i++) {
+		if(data.time.imagPart[i] < ignoreImagAmplitudesLowerThan) {
+			data.time.imagPart[i] = 0;
+		}
+	}
+
+	//Return the whole thing
+	return data;
+
 }
 
 /* 
