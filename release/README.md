@@ -16,14 +16,14 @@ Whereas ```data``` has the following properties.
 data = {
     //Time domain data
     time: {
-        realPart: []    //Real part
-        imagPart: []    //Imaginay part
+        realPart: [],   //Real part
+        imagPart: [],   //Imaginary part
         time: []        //Time axis
     },
     //Frequency domain data
     frequency:{
         realPart: [],	//FFT real part
-        imagPart: [],	//FFT imaginay part
+        imagPart: [],	//FFT imaginary part
         amplitude: [],  //Amplitude module
         phase: [],      //Phase [rad]
         frequency: []   //Frequency axis [Hz]
@@ -51,38 +51,40 @@ data = ifft(data.frequency.amplitude, data.frequency.frequency); //Get the time 
 
 ```
 
-HELL YEAH! So easy. If you want a easy way to plot your data in the browser, go to bonus at the end of this readme
+HELL YEAH! So easy. If you want an easy way to plot your data in the browser, go to the bonus at the end of this readme.
 
 ### Install
-`npm i ezfft`
+    npm i ezfft
 
 ### FFT
-+ **fft (signal, fs, imagPart = 0, ignoreFftAmplitudesLowerThan = 1e-3)**
++ ***`fft (signal, fs, imagPart = 0, ignoreFftAmplitudesLowerThan = 1e-3)`***
 + **Input**
-- *signal:* Time signal [Array]
-- *fs:* Sample frequency (Hz) [Array]
-- [Optional] *imagPart:* Imaginary part of the signal (if any) [Array]
-- [Optional] *ignoreFftAmplitudesLowerThan:* Threshold to make fft value equals to zero [Value]
+    - *signal:* Time signal [Array]
+    - *fs:* Sample frequency (Hz) [Array]
+    - **[Optional]** *imagPart:* Imaginary part of the signal (if any) [Array]
+    - **[Optional]** *ignoreFftAmplitudesLowerThan:* Threshold to make fft value equals to zero [Value]
 + **Output**
-- *data:* Data object [Object]
+    - *data:* Data object [Object]
 
 ### IFFT
-+ **ifft(amplitude, frequency, phase = 0, fftRealPart = 0, fftImagPart = 0, ignoreImagAmplitudesLowerThan = 1e-3)**
++ ***`ifft(amplitude, frequency, phase = 0, fftRealPart = 0, fftImagPart = 0, ignoreImagAmplitudesLowerThan = 1e-3)`***
 + **Input**
-- *amplitude:* Amplitude axis [Array]
-- *frequency:* Frequency axis (Hz) [Array]
-- [Optional] *phase:* Phase axis (if any) [Array]
-- [Optional] *fftRealPart:* Real part of FFT (overrides the parameters *amplitude* and *phase*) [Array]
-- [Optional] *fftImagPart:* Imaginary part of FFT (overrides the parameters *amplitude* and *phase*) [Array]
-- [Optional] *ignoreImagAmplitudesLowerThan:* Threshold to make imag value equals to zero [Value]
+    - *amplitude:* Amplitude axis [Array]
+    - *frequency:* Frequency axis (Hz) [Array]
+    - **[Optional]** *phase:* Phase axis (if any) [Array]
+    - **[Optional]** *fftRealPart:* Real part of FFT (overrides the parameters *amplitude* and *phase*) [Array]
+    - **[Optional]** *fftImagPart:* Imaginary part of FFT (overrides the parameters *amplitude* and *phase*) [Array]
+    - **[Optional]** *ignoreImagAmplitudesLowerThan:* Threshold to make imag value equals to zero [Value]
 + **Output**
-- *data:* Data object [Object]
+    - *data:* Data object [Object]
 
-### Plot your data with express and socket.io in 3 steps (Bonus)
+### **[BONUS]** Plot your data with express and socket.io in 3 steps!
 Install `express`
-`npm install express`
+    
+    npm install express
 Install `socket.io`
-`npm install socket.io`
+
+    npm install socket.io
 
 Create a `index.html`. You can change the your graph size below.
 ```HTML

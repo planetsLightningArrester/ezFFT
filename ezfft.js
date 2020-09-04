@@ -27,7 +27,7 @@ module.exports = {
 
 /* 
  * Wrapper of wrapper fft function where:
- * - signal [vector]: is the aquired signal in time (or the real part)
+ * - signal [vector]: is the acquired signal in time (or the real part)
  * - fs [number]: is the sample rate [Hz]
  * - imagPart [vector]: is the imaginary part (if any) [optional]
  */
@@ -39,13 +39,13 @@ function fft (signal, fs, imagPart = 0, ignoreFftAmplitudesLowerThan = 1e-3) {
         //Time domain data
         time: {
             realPart: signal,   //Real part
-            imagPart: imagPart, //Imaginay part
+            imagPart: imagPart, //Imaginary part
             time: []            //Time axis
         },
         //Frequency domain data
         frequency:{
 			realPart: [],		//FFT real part
-			imagPart: [],		//FFT imaginay part
+			imagPart: [],		//FFT imaginary part
             amplitude: [],      //Amplitude module
             phase: [],          //Phase [rad]
             frequency: []       //Frequency axis
@@ -73,7 +73,7 @@ function fft (signal, fs, imagPart = 0, ignoreFftAmplitudesLowerThan = 1e-3) {
         }
     }
 
-    //Auxiliaries variables for FFT processing whitout address association
+    //Auxiliaries variables for FFT processing without address association
     let auxReal = data.time.realPart.map(function(num){return num;});
     let auxImag = data.time.imagPart.map(function(num){return num;});
 
@@ -137,13 +137,13 @@ function ifft(amplitude, frequency, phase = 0, fftRealPart = 0, fftImagPart = 0,
         //Time domain data
         time: {
             realPart: [],   //Real part
-            imagPart: [],	//Imaginay part
+            imagPart: [],	//Imaginary part
             time: []		//Time axis
         },
         //Frequency domain data
         frequency:{
 			realPart: [],				//FFT real part
-			imagPart: [],				//FFT imaginay part
+			imagPart: [],				//FFT imaginary part
             amplitude: amplitude,		//Amplitude module
             phase: [],					//Phase [rad]
             frequency: frequency		//Frequency axis
@@ -170,7 +170,7 @@ function ifft(amplitude, frequency, phase = 0, fftRealPart = 0, fftImagPart = 0,
 		data.frequency.phase = phase;
 	}
 
-	//If no real and imaginay part has been passed
+	//If no real and imaginary part has been passed
 	if(typeof fftRealPart.length == 'undefined' && typeof fftImagPart.length == 'undefined') {
 		//Calculate them
 		for (let i = 0 ; i < data.frequency.amplitude.length; i ++) {
@@ -183,7 +183,7 @@ function ifft(amplitude, frequency, phase = 0, fftRealPart = 0, fftImagPart = 0,
 		data.frequency.imagPart = fftImagPart.map(function(num){return num;});
 	}
 
-	//Auxiliaries variables for FFT processing whiout address association
+	//Auxiliaries variables for FFT processing without address association
 	let auxReal = data.frequency.realPart.map(function(num){return num;});
 	let auxImag = data.frequency.imagPart.map(function(num){return num;});
 
@@ -310,7 +310,7 @@ function transformBluestein(real, imag) {
 	while (m < n * 2 + 1)
 		m *= 2;
 	
-	// Trignometric tables
+	// Trigonometric tables
 	var cosTable = new Array(n);
 	var sinTable = new Array(n);
 	for (var i = 0; i < n; i++) {

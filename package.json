@@ -1,7 +1,7 @@
 {
   "name": "ezfft",
-  "version": "1.0.1",
-  "description": "Easy way to get FFT from a signal",
+  "version": "1.0.2",
+  "description": "An easy way to get the FFT from a signal",
   "main": "ezfft.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
