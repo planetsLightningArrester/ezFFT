@@ -68,7 +68,7 @@ export interface fftData {
     frequency: number[]
   },
   /**
-   * 
+   * Sample frequency
    */
   fs: number,
   /**
