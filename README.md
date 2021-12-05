@@ -4,32 +4,35 @@ Easy as fun
 ```Javascript
 let fft = require("ezfft").fft;
 let ifft = require("ezfft").ifft;
+// import { fft, ifft } from "ezfft"; // Or import on ES5+
+
 ...
-let data = fft(signal, fs);    //OMG ITS EZ AS F*
-console.log(data.frequency.amplitude);  //Amplitude axis
-console.log(data.frequency.phase);      //Phase axis
-console.log(data.frequency.frequency);  //Frequency axis
+
+let data = fft(signal, fs);    // OMG ITS EZ AS F*
+console.log(data.frequency.amplitude);  // Amplitude axis
+console.log(data.frequency.phase);      // Phase axis
+console.log(data.frequency.frequency);  // Frequency axis
 ```
 Whereas ```data``` has the following properties.
 
 ```Javascript
 data = {
-    //Time domain data
+    // Time domain data
     time: {
-        realPart: [],   //Real part
-        imagPart: [],   //Imaginary part
-        time: []        //Time axis
+        realPart: [],   // Real part
+        imagPart: [],   // Imaginary part
+        time: []        // Time axis
     },
-    //Frequency domain data
+    // Frequency domain data
     frequency:{
-        realPart: [],	//FFT real part
-        imagPart: [],	//FFT imaginary part
-        amplitude: [],  //Amplitude module
-        phase: [],      //Phase [rad]
-        frequency: []   //Frequency axis [Hz]
+        realPart: [],	// FFT real part
+        imagPart: [],	// FFT imaginary part
+        amplitude: [],  // Amplitude module
+        phase: [],      // Phase [rad]
+        frequency: []   // Frequency axis [Hz]
     },
-    fs: fs,             //Sample rate in Hz
-    samplingTime: st    //Sampling time in seconds
+    fs: fs,             // Sample rate in Hz
+    samplingTime: st    // Sampling time in seconds
 }
 ```
 
@@ -38,16 +41,16 @@ data = {
 let fft = require('ezfft').fft;
 let ifft = require('ezfft').ifft;
 
-let signal = [];    //My awesome signal
-let fs = 1000;      //My awesome sample rate
+let signal = [];    // My awesome signal
+let fs = 1000;      // My awesome sample rate
 
-let f = 20;         //Yours signal awesome frequency
+let f = 20;         // My signal's awesome frequency
 for(let t = 0; t < 1; t += 1/fs) {
-    signal.push(3*Math.sin(2*Math.PI*f*t));   //Let's make some sin ;-) (oh yeah go with it)
+    signal.push(3*Math.sin(2*Math.PI*f*t));   // Let's make some sin ;-) (oh yeah go with it)
 }
 
-let data = fft(signal, fs);    //Returns the whole signal with frequency and time domain axis
-data = ifft(data.frequency.amplitude, data.frequency.frequency); //Get the time from frequency domain
+let data = fft(signal, fs);    // Returns the whole signal with frequency and time domain axis
+data = ifft(data.frequency.amplitude, data.frequency.frequency); // Get the time from frequency domain
 
 ```
 
@@ -190,10 +193,11 @@ Create a `main.js` file with the content below and run it with `node main.js`.
 And access by your browser the `localhost:8013`
 
 ```Javascript
-//npm install ezfft
-let fft = require("ezfft").fft
+// npm install ezfft
+let fft = require("ezfft").fft;
+// import { fft } from "ezfft";
 
-//npm install express
+// npm install express
 var express = require('express');
 var appExpress = express();
 var http = require('http').Server(appExpress);
@@ -202,14 +206,14 @@ var http = require('http').Server(appExpress);
 appExpress.use("/", express.static(__dirname + "/"));
 
 appExpress.get('/', function (req, res) {
-    res.sendFile(__dirname + '/index.html');    //Name of your local web page
+    res.sendFile(__dirname + '/index.html');    // Name of your local web page
 });
 
 http.listen(8013, function () {
     console.log('With your browser, access "localhost:8013"');
 });
 
-//npm install socket.io
+// npm install socket.io
 var io = require('socket.io')(http);
 
 /*Socket configuration*/
@@ -218,25 +222,25 @@ io.on('connection', function (socket) {
     console.log("LESGO");
 
     setInterval(function () {
-        let signal = [];        //Array with the Y axis (amplitude in time)
-        let time = [];          //Array with the X axis (time)
+        let signal = [];        // Array with the Y axis (amplitude in time)
+        let time = [];          // Array with the X axis (time)
 
         let data;
         
-        let f = 60;              //Your signal frequency
-        let fs = 1000;          //Your sample rate
-        let samplingTime = 1;   //Period that the signal was sampled
+        let f = 60;             // Your signal frequency
+        let fs = 1000;          // Your sample rate
+        let samplingTime = 1;   // Period that the signal was sampled
 
         for(let t = 0; t < samplingTime; t += 1/fs){
-            signal.push(180*Math.sin(2*Math.PI*f*t) + 20*Math.sin(2*Math.PI*2*f*t) + 2*Math.sin(2*Math.PI*3*f*t));  //The generated signal
+            signal.push(180*Math.sin(2*Math.PI*f*t) + 20*Math.sin(2*Math.PI*2*f*t) + 2*Math.sin(2*Math.PI*3*f*t));  // The generated signal
             time.push(t);                  //Append time axis
         }
 
-        data = fft(signal, fs);   //Get FFT of the signal
+        data = fft(signal, fs);   // Get signal's FFT
         
-        socket.emit("data", data);   //Send data to the Browser
+        socket.emit("data", data);   // Send data to Browser
 
-    }, 2000);       //Update rate in sec
+    }, 2000);       // Update rate in sec
 });
 
 ```

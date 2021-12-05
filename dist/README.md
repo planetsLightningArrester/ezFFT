@@ -4,7 +4,10 @@ Easy as fun
 ```Javascript
 let fft = require("ezfft").fft;
 let ifft = require("ezfft").ifft;
+// import { fft, ifft } from "ezfft"; // Or ES5+
+
 ...
+
 let data = fft(signal, fs);    //OMG ITS EZ AS F*
 console.log(data.frequency.amplitude);  //Amplitude axis
 console.log(data.frequency.phase);      //Phase axis
