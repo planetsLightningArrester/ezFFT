@@ -1,1 +1,6 @@
 .vscode
+node_modules
+sandbox
+src/**/*.js
+!src/golden.js
+!src/tests/*
