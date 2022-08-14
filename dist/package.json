@@ -1,10 +1,11 @@
 {
   "name": "ezfft",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "An easy way to get the FFT from a signal",
   "main": "ezfft.js",
   "scripts": {
     "build": "tsc --declaration --declarationDir dist --outDir tmp src/ezfft.ts && webpack --mode production && powershell rm -r tmp",
+    "publish": "cd dist && npm publish --access=public",
     "test": "jest"
   },
   "repository": {
