@@ -4,7 +4,9 @@
   "description": "An easy way to get the FFT from a signal",
   "main": "ezfft.js",
   "scripts": {
-    "build": "tsc --declaration --declarationDir dist --outDir tmp src/ezfft.ts && webpack --mode production && powershell rm -r tmp",
+    "build": "run-script-os",
+    "build:windows": "tsc --declaration --declarationDir dist --outDir tmp src/ezfft.ts && webpack --mode production && powershell rm -r tmp",
+    "build:linux": "tsc --declaration --declarationDir dist --outDir tmp src/ezfft.ts && webpack --mode production && rm -rf tmp",
     "pub": "cd dist && npm publish --access=public",
     "test": "jest"
   },
