@@ -1,6 +1,6 @@
 {
   "name": "ezfft",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "An easy way to get the FFT from a signal",
   "main": "ezfft.js",
   "scripts": {
