@@ -1,7 +1,7 @@
 const fft = require('../../dist/ezfft').fft;
 const ifft = require('../../dist/ezfft').ifft;
 
-test('basic', () => {
+test('js build test', () => {
   let signal = [];    //My awesome signal
   let fs = 1000;      //My awesome sample rate
 
