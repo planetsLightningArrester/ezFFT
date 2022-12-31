@@ -1,0 +1,55 @@
+# Create release workflow
+
+name: Create release
+
+on:
+  push:
+    tags:
+      - 'v*' # Push events matching v*, i.e. v0.0.2, v1, etc.
+
+jobs:
+
+  # Call CI
+  ci-check:
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  create-release:
+    runs-on: [ self-hosted ]
+    needs: ci-check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set Release version
+        run: echo "RELEASE_VERSION=$(echo ${{ github.ref_name }} | cut -c 2-)" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }} # Create a "personal token" and added as a "secret" in the repo settings
+        with:
+          tag_name: v${{ env.RELEASE_VERSION }}
+          release_name: Parser v${{ env.RELEASE_VERSION }}
+          body_path: ./CHANGELOG.md
+
+  # Release on NPM
+  npm-release:
+    runs-on: [ self-hosted ]
+    needs: create-release
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install dependencies and build 🔧
+      run: npm ci && npm run build
+
+    - name: Publish package on NPM 📦
+      run: npm run pub
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+# EOF

@@ -1,0 +1,82 @@
+# Continuos Integration workflow
+
+name: CI
+
+defaults:
+  run:
+    shell: bash -ieo pipefail {0}
+
+# Controls when the workflow will run
+on:
+  # Nightly - running every 00:00 UTC
+  schedule:
+    - cron: '0 0 * * *'
+
+  # Main push
+  push:
+    branches: ['main']
+
+  # Any pull request update
+  pull_request:
+
+  # Can be triggered by other workflows
+  workflow_call:
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+# Jobs
+jobs:
+
+  basic:
+    runs-on: [ self-hosted ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run:  npm ci
+      
+      - name: Run test
+        run:  npm run test basic
+
+  performance:
+    runs-on: [ self-hosted ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run:  npm ci
+      
+      - name: Run test
+        run:  npm run test performance
+
+  types:
+    runs-on: [ self-hosted ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run:  npm ci
+      
+      - name: Run test
+        run:  npm run test types
+
+  webpack:
+    runs-on: [ self-hosted ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run:  npm ci
+
+      - name: Generate production bundle
+        run:  npm run build
+      
+      - name: Run test
+        run:  npm run test build
+
+# EOF
