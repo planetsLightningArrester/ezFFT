@@ -3,5 +3,5 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   setupFiles: [],
-  transformIgnorePatterns: ['dist.*']
+  testPathIgnorePatterns: [ 'out', 'dist' ]
 };
