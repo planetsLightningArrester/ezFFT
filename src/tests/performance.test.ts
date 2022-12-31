@@ -25,7 +25,7 @@ test('performance', () => {
   console.log(`\tFFT (ms)\tIFFT (ms)\t\n\t${fftResult.toFixed(3)}\t\t${ifftResult.toFixed(3)}\t`);
 
   // Constraints
-  expect(fftResult).toBeLessThan(20);
-  expect(ifftResult).toBeLessThan(10);
+  expect(fftResult).toBeLessThan(50);
+  expect(ifftResult).toBeLessThan(25);
 
 });
