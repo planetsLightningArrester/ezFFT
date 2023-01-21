@@ -32,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }} # Create a "personal token" and added as a "secret" in the repo settings
         with:
           tag_name: v${{ env.RELEASE_VERSION }}
-          release_name: Parser v${{ env.RELEASE_VERSION }}
+          release_name: ezFFT v${{ env.RELEASE_VERSION }}
           body_path: ./CHANGELOG.md
 
   # Release on NPM
