@@ -1,6 +1,10 @@
 # ezFFT - Node JS
 Easy as fun
 
+![npm](https://img.shields.io/npm/v/ezfft)
+
+[![CI](https://github.com/planetsLightningArrester/ezFFT/actions/workflows/ci.yml/badge.svg)](https://github.com/planetsLightningArrester/ezFFT/actions/workflows/ci.yml)
+
 ```Javascript
 let fft = require("ezfft").fft;
 let ifft = require("ezfft").ifft;
