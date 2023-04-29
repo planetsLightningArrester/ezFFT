@@ -8,16 +8,14 @@ defaults:
 
 # Controls when the workflow will run
 on:
-  # Nightly - running every 00:00 UTC
-  schedule:
-    - cron: '0 0 * * *'
 
   # Main push
   push:
     branches: ['main']
-
-  # Any pull request update
+    
+    # Any pull request update
   pull_request:
+    branches: ['main']
 
   # Can be triggered by other workflows
   workflow_call:
