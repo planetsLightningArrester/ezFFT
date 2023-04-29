@@ -27,7 +27,7 @@ on:
 jobs:
 
   basic:
-    runs-on: [ self-hosted ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
         run:  npm run test basic
 
   types:
-    runs-on: [ self-hosted ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
         run:  npm run test types
 
   webpack:
-    runs-on: [ self-hosted ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
