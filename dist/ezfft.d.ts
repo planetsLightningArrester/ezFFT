@@ -1,57 +1,72 @@
-/**
- * FFT data type
- */
-export interface fftData {
+/** Real and imaginary parts in the time domain */
+export declare class fftDataTime {
+    /** Real part */
+    real: number[];
     /**
-     * Time domain data
+     * Real part
+     * @deprecated use `real` instead
      */
-    time: {
-        /**
-         * Real part
-         */
-        realPart: number[];
-        /**
-         * Imaginary part
-         */
-        imagPart: number[];
-        /**
-         * Time axis
-         */
-        time: number[];
-    };
+    realPart: number[];
+    /** Imaginary part */
+    imag: number[];
     /**
-     * Frequency domain data
+     * Imaginary part
+     * @deprecated use `imag` instead
      */
-    frequency: {
-        /**
-         * FFT real part
-         */
-        realPart: number[];
-        /**
-         * FFT imaginary part
-         */
-        imagPart: number[];
-        /**
-         * Amplitude module
-         */
-        amplitude: number[];
-        /**
-         * Phase [rad]
-         */
-        phase: number[];
-        /**
-         * Frequency axis
-         */
-        frequency: number[];
-    };
+    imagPart: number[];
+    /** Time axis */
+    time: number[];
     /**
-     * Sample frequency
+     * Create new data in the time domain
+     * @param real the real part
+     * @param imaginary the imaginary part
      */
+    constructor(real: number[], imaginary: number[]);
+}
+/** Real and imaginary parts in the frequency domain */
+export declare class fftDataFrequency {
+    /** FFT real part */
+    real: number[];
+    /**
+     * FFT real part
+     * @deprecated use `real` instead
+     */
+    realPart: number[];
+    /** FFT imaginary part */
+    imag: number[];
+    /**
+     * FFT imaginary part
+     * @deprecated use `real` instead
+     */
+    imagPart: number[];
+    /** Amplitude module */
+    amplitude: number[];
+    /** Phase [rad] */
+    phase: number[];
+    /** Frequency axis */
+    frequency: number[];
+    /**
+     * Create new data in the frequency domain
+     * @param real the real part
+     * @param imaginary the imaginary part
+     */
+    constructor(real: number[], imaginary: number[]);
+}
+/** FFT data type */
+export declare class fftData {
+    /** Time domain data */
+    time: fftDataTime;
+    /** Frequency domain data */
+    frequency: fftDataFrequency;
+    /** Sample frequency */
     fs: number;
-    /**
-     * Sampling time in seconds
-     */
+    /** Sampling time in seconds */
     samplingTime: number;
+    /**
+     * Create a new `fftData`
+     * @param fs sample frequency
+     */
+    constructor(real: number[], imaginary: number[], fs: number);
 }
 /**
  * Perform the FFT of a given signal

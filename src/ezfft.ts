@@ -21,60 +21,102 @@
  *   Software.
  */
 
-/**
- * FFT data type
- */
-export interface fftData {
+/** Real and imaginary parts in the time domain */
+export class fftDataTime {
+  /** Real part */
+  real: number[];
   /**
-   * Time domain data
+   * Real part
+   * @deprecated use `real` instead
    */
-  time: {
-    /**
-     * Real part
-     */
-    realPart: number[],
-    /**
-     * Imaginary part
-     */
-    imagPart: number[],
-    /**
-     * Time axis
-     */
-    time: number[]
-  },
+  realPart: number[];
+  /** Imaginary part */
+  imag: number[];
   /**
-   * Frequency domain data
+   * Imaginary part
+   * @deprecated use `imag` instead
    */
-  frequency: {
-    /**
-     * FFT real part
-     */
-    realPart: number[],
-    /**
-     * FFT imaginary part
-     */
-    imagPart: number[],
-    /**
-     * Amplitude module
-     */
-    amplitude: number[],
-    /**
-     * Phase [rad]
-     */
-    phase: number[],
-    /**
-     * Frequency axis
-     */
-    frequency: number[]
-  },
+  imagPart: number[];
+  /** Time axis */
+  time: number[];
+
   /**
-   * Sample frequency
+   * Create new data in the time domain
+   * @param real the real part
+   * @param imaginary the imaginary part
    */
-  fs: number,
+  constructor(real: number[], imaginary: number[]) {
+    this.real = real;
+    this.realPart = real;
+    this.imag = imaginary;
+    this.imagPart = imaginary;
+    this.time = [];
+  }
+
+}
+
+/** Real and imaginary parts in the frequency domain */
+export class fftDataFrequency {
+  /** FFT real part */
+  real: number[];
   /**
-   * Sampling time in seconds
+   * FFT real part
+   * @deprecated use `real` instead
    */
-  samplingTime: number
+  realPart: number[];
+  /** FFT imaginary part */
+  imag: number[];
+  /**
+   * FFT imaginary part
+   * @deprecated use `real` instead
+   */
+  imagPart: number[];
+  /** Amplitude module */
+  amplitude: number[];
+  /** Phase [rad] */
+  phase: number[];
+  /** Frequency axis */
+  frequency: number[];
+
+  /**
+   * Create new data in the frequency domain
+   * @param real the real part
+   * @param imaginary the imaginary part
+   */
+  constructor(real: number[], imaginary: number[]) {
+    this.real = real;
+    this.realPart = real;
+    this.imag = imaginary;
+    this.imagPart = imaginary;
+    this.amplitude = [];
+    this.phase = [];
+    this.frequency = [];
+  }
+
+}
+
+/** FFT data type */
+export class fftData {
+  /** Time domain data */
+  time: fftDataTime;
+  /** Frequency domain data */
+  frequency: fftDataFrequency;
+  /** Sample frequency */
+  fs: number;
+  /** Sampling time in seconds */
+  samplingTime: number;
+
+  /**
+   * Create a new `fftData`
+   * @param fs sample frequency
+   */
+  constructor(real: number[], imaginary: number[], fs: number) {
+    this.time = new fftDataTime(real, imaginary);
+    this.frequency = new fftDataFrequency([], []);
+    this.fs = fs;
+    this.samplingTime = 0;
+  }
+
 }
 
 /**
@@ -85,27 +127,10 @@ export interface fftData {
  * @param ignoreFftAmplitudesLowerThan threshold to filter out signals below some value
  * @returns a `fftData` with the results of the FFT
  */
-export function fft(signal: number[], fs: number, imagPart: number[] = [], ignoreFftAmplitudesLowerThan: number = 1e-3): fftData {
+export function fft(signal: number[], fs: number, imagPart: number[] = [], ignoreFftAmplitudesLowerThan = 1e-3): fftData {
 
   //Create an object that contains all data about the signal
-  let data: fftData = {
-    //Time domain data
-    time: {
-      realPart: signal, //Real part
-      imagPart: imagPart, //Imaginary part
-      time: [] //Time axis
-    },
-    //Frequency domain data
-    frequency: {
-      realPart: [], //FFT real part
-      imagPart: [], //FFT imaginary part
-      amplitude: [], //Amplitude module
-      phase: [], //Phase [rad]
-      frequency: [] //Frequency axis
-    },
-    fs: fs, //Sample rate in Hz
-    samplingTime: 0 //Sampling time in seconds
-  }
+  const data: fftData = new fftData(signal, imagPart, fs);
 
   //Check if "fs" is not zero
   if (data.fs == 0) {
@@ -127,10 +152,10 @@ export function fft(signal: number[], fs: number, imagPart: number[] = [], ignor
   }
 
   //Auxiliaries variables for FFT processing without address association
-  let auxReal = data.time.realPart.map(function (num) {
+  const auxReal = data.time.realPart.map(function (num) {
     return num;
   });
-  let auxImag = data.time.imagPart.map(function (num) {
+  const auxImag = data.time.imagPart.map(function (num) {
     return num;
   });
 
@@ -181,6 +206,10 @@ export function fft(signal: number[], fs: number, imagPart: number[] = [], ignor
   data.samplingTime -= 1 / fs;
 
   //Returns the whole thing
+  data.time.real = data.time.realPart;
+  data.time.imag = data.time.imagPart;
+  data.frequency.real = data.frequency.realPart;
+  data.frequency.imag = data.frequency.imagPart;
   return data;
 }
 
@@ -194,18 +223,22 @@ export function fft(signal: number[], fs: number, imagPart: number[] = [], ignor
  * @param ignoreImagAmplitudesLowerThan threshold to filter out imag values below some value
  * @returns a `fftData` with the results of the IFFT
  */
-export function ifft(amplitude: number[], frequency: number[], phase: number[] = [], fftRealPart: number[] = [], fftImagPart: number[] = [], ignoreImagAmplitudesLowerThan: number = 1e-3): fftData {
+export function ifft(amplitude: number[], frequency: number[], phase: number[] = [], fftRealPart: number[] = [], fftImagPart: number[] = [], ignoreImagAmplitudesLowerThan = 1e-3): fftData {
   //Create an object that contains all data about the signal
-  let data: fftData = {
+  const data: fftData = {
     //Time domain data
     time: {
+      real: [], //Real part
       realPart: [], //Real part
+      imag: [], //Imaginary part
       imagPart: [], //Imaginary part
       time: [] //Time axis
     },
     //Frequency domain data
     frequency: {
+      real: [], //FFT real part
       realPart: [], //FFT real part
+      imag: [], //FFT imaginary part
       imagPart: [], //FFT imaginary part
       amplitude: amplitude, //Amplitude module
       phase: [], //Phase [rad]
@@ -253,10 +286,10 @@ export function ifft(amplitude: number[], frequency: number[], phase: number[] =
   }
 
   //Auxiliaries variables for FFT processing without address association
-  let auxReal = data.frequency.realPart.map(function (num) {
+  const auxReal = data.frequency.realPart.map(function (num) {
     return num;
   });
-  let auxImag = data.frequency.imagPart.map(function (num) {
+  const auxImag = data.frequency.imagPart.map(function (num) {
     return num;
   });
 
@@ -271,6 +304,10 @@ export function ifft(amplitude: number[], frequency: number[], phase: number[] =
   }
 
   //Return the whole thing
+  data.time.real = data.time.realPart;
+  data.time.imag = data.time.imagPart;
+  data.frequency.real = data.frequency.realPart;
+  data.frequency.imag = data.frequency.imagPart;
   return data;
 
 }
@@ -283,7 +320,7 @@ export function ifft(amplitude: number[], frequency: number[], phase: number[] =
  * @returns 
  */
 function transform(real: number[], imag: number[]): Array<number[]> {
-  var n = real.length;
+  const n = real.length;
   if (n != imag.length)
     throw "Mismatched lengths";
   if (n == 0)
@@ -314,13 +351,13 @@ function inverseTransform(real: number[], imag: number[]): Array<number[]> {
  */
 function transformRadix2(real: number[], imag: number[]): Array<number[]> {
   // Length variables
-  var n = real.length;
+  const n = real.length;
   if (n != imag.length)
     throw "Mismatched lengths";
   if (n == 1) // Trivial transform
     return [];
-  var levels = -1;
-  for (var i = 0; i < 32; i++) {
+  let levels = -1;
+  for (let i = 0; i < 32; i++) {
     if (1 << i == n)
       levels = i; // Equal to log2(n)
   }
@@ -328,18 +365,18 @@ function transformRadix2(real: number[], imag: number[]): Array<number[]> {
     throw "Length is not a power of 2";
 
   // Trigonometric tables
-  var cosTable = new Array(n / 2);
-  var sinTable = new Array(n / 2);
-  for (var i = 0; i < n / 2; i++) {
+  const cosTable = new Array(n / 2);
+  const sinTable = new Array(n / 2);
+  for (let i = 0; i < n / 2; i++) {
     cosTable[i] = Math.cos(2 * Math.PI * i / n);
     sinTable[i] = Math.sin(2 * Math.PI * i / n);
   }
 
   // Bit-reversed addressing permutation
-  for (var i = 0; i < n; i++) {
-    var j = reverseBits(i, levels);
+  for (let i = 0; i < n; i++) {
+    const j = reverseBits(i, levels);
     if (j > i) {
-      var temp = real[i];
+      let temp = real[i];
       real[i] = real[j];
       real[j] = temp;
       temp = imag[i];
@@ -349,18 +386,18 @@ function transformRadix2(real: number[], imag: number[]): Array<number[]> {
   }
 
   // Cooley-Tukey decimation-in-time radix-2 FFT
-  for (var size = 2; size <= n; size *= 2) {
-    var halfsize = size / 2;
-    var tablestep = n / size;
-    for (var i = 0; i < n; i += size) {
-      for (var j = i, k = 0; j < i + halfsize; j++, k += tablestep) {
-        var l = j + halfsize;
-        var tpre = real[l] * cosTable[k] + imag[l] * sinTable[k];
-        var tpim = -real[l] * sinTable[k] + imag[l] * cosTable[k];
-        real[l] = real[j] - tpre;
-        imag[l] = imag[j] - tpim;
-        real[j] += tpre;
-        imag[j] += tpim;
+  for (let size = 2; size <= n; size *= 2) {
+    const halfSize = size / 2;
+    const tableStep = n / size;
+    for (let i = 0; i < n; i += size) {
+      for (let j = i, k = 0; j < i + halfSize; j++, k += tableStep) {
+        const l = j + halfSize;
+        const tPre = real[l] * cosTable[k] + imag[l] * sinTable[k];
+        const tPim = -real[l] * sinTable[k] + imag[l] * cosTable[k];
+        real[l] = real[j] - tPre;
+        imag[l] = imag[j] - tPim;
+        real[j] += tPre;
+        imag[j] += tPim;
       }
     }
   }
@@ -375,8 +412,8 @@ function transformRadix2(real: number[], imag: number[]): Array<number[]> {
  * @returns 
  */
 function reverseBits(x: number, bits: number): number {
-  var y = 0;
-  for (var i = 0; i < bits; i++) {
+  let y = 0;
+  for (let i = 0; i < bits; i++) {
     y = (y << 1) | (x & 1);
     x >>>= 1;
   }
@@ -393,63 +430,50 @@ function reverseBits(x: number, bits: number): number {
  */
 function transformBluestein(real: number[], imag: number[]): Array<number[]> {
   // Find a power-of-2 convolution length m such that m >= n * 2 + 1
-  var n = real.length;
+  const n = real.length;
   if (n != imag.length)
     throw "Mismatched lengths";
-  var m = 1;
+  let m = 1;
   while (m < n * 2 + 1)
     m *= 2;
 
   // Trigonometric tables
-  var cosTable = new Array(n);
-  var sinTable = new Array(n);
-  for (var i = 0; i < n; i++) {
-    var j = i * i % (n * 2); // This is more accurate than j = i * i
+  const cosTable = new Array(n);
+  const sinTable = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const j = i * i % (n * 2); // This is more accurate than j = i * i
     cosTable[i] = Math.cos(Math.PI * j / n);
     sinTable[i] = Math.sin(Math.PI * j / n);
   }
 
   // Temporary vectors and preprocessing
-  var areal = newArrayOfZeros(m);
-  var aimag = newArrayOfZeros(m);
-  for (var i = 0; i < n; i++) {
-    areal[i] = real[i] * cosTable[i] + imag[i] * sinTable[i];
-    aimag[i] = -real[i] * sinTable[i] + imag[i] * cosTable[i];
+  const aReal = newArrayOfZeros(m);
+  const aImag = newArrayOfZeros(m);
+  for (let i = 0; i < n; i++) {
+    aReal[i] = real[i] * cosTable[i] + imag[i] * sinTable[i];
+    aImag[i] = -real[i] * sinTable[i] + imag[i] * cosTable[i];
   }
-  var breal = newArrayOfZeros(m);
-  var bimag = newArrayOfZeros(m);
-  breal[0] = cosTable[0];
-  bimag[0] = sinTable[0];
-  for (var i = 1; i < n; i++) {
-    breal[i] = breal[m - i] = cosTable[i];
-    bimag[i] = bimag[m - i] = sinTable[i];
+  const bReal = newArrayOfZeros(m);
+  const bImag = newArrayOfZeros(m);
+  bReal[0] = cosTable[0];
+  bImag[0] = sinTable[0];
+  for (let i = 1; i < n; i++) {
+    bReal[i] = bReal[m - i] = cosTable[i];
+    bImag[i] = bImag[m - i] = sinTable[i];
   }
 
   // Convolution
-  var cReal = new Array(m);
-  var cImag = new Array(m);
-  convolveComplex(areal, aimag, breal, bimag, cReal, cImag);
+  const cReal = new Array(m);
+  const cImag = new Array(m);
+  convolveComplex(aReal, aImag, bReal, bImag, cReal, cImag);
 
   // Postprocessing
-  for (var i = 0; i < n; i++) {
+  for (let i = 0; i < n; i++) {
     real[i] = cReal[i] * cosTable[i] + cImag[i] * sinTable[i];
     imag[i] = -cReal[i] * sinTable[i] + cImag[i] * cosTable[i];
   }
 
   return [real, imag];
-}
-
-/**
- * Computes the circular convolution of the given real vectors. Each vector's length must be the same.
- * @param x 
- * @param y 
- * @param out 
- */
-function convolveReal(x: number[], y: number[], out: number[]): void {
-  var n = x.length;
-  if (n != y.length || n != out.length)
-    throw "Mismatched lengths";
-  convolveComplex(x, newArrayOfZeros(n), y, newArrayOfZeros(n), out, newArrayOfZeros(n));
 }
 
 /**
@@ -462,7 +486,7 @@ function convolveReal(x: number[], y: number[], out: number[]): void {
  * @param outImag 
  */
 function convolveComplex(xReal: number[], xImag: number[], yReal: number[], yImag: number[], outReal: number[], outImag: number[]): void {
-  var n = xReal.length;
+  const n = xReal.length;
   if (n != xImag.length || n != yReal.length || n != yImag.length ||
     n != outReal.length || n != outImag.length)
     throw "Mismatched lengths";
@@ -474,14 +498,14 @@ function convolveComplex(xReal: number[], xImag: number[], yReal: number[], yIma
   transform(xReal, xImag);
   transform(yReal, yImag);
 
-  for (var i = 0; i < n; i++) {
-    var temp = xReal[i] * yReal[i] - xImag[i] * yImag[i];
+  for (let i = 0; i < n; i++) {
+    const temp = xReal[i] * yReal[i] - xImag[i] * yImag[i];
     xImag[i] = xImag[i] * yReal[i] + xReal[i] * yImag[i];
     xReal[i] = temp;
   }
   inverseTransform(xReal, xImag);
 
-  for (var i = 0; i < n; i++) { // Scaling (because this FFT implementation omits it)
+  for (let i = 0; i < n; i++) { // Scaling (because this FFT implementation omits it)
     outReal[i] = xReal[i] / n;
     outImag[i] = xImag[i] / n;
   }
@@ -493,8 +517,8 @@ function convolveComplex(xReal: number[], xImag: number[], yReal: number[], yIma
  * @returns the resulting array
  */
 function newArrayOfZeros(n: number): number[] {
-  var result = [];
-  for (var i = 0; i < n; i++)
+  const result = [];
+  for (let i = 0; i < n; i++)
     result.push(0);
   return result;
 }
