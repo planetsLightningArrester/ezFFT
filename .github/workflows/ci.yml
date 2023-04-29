@@ -12,10 +12,20 @@ on:
   # Main push
   push:
     branches: ['main']
+    paths-ignore:
+      - README.md
+      - CHANGELOG.md
+      - LICENSE
+      - .github/workflows/release.yml
     
-    # Any pull request update
+  # Any updates in pull requests
   pull_request:
     branches: ['main']
+    paths-ignore:
+      - README.md
+      - CHANGELOG.md
+      - LICENSE
+      - .github/workflows/release.yml
 
   # Can be triggered by other workflows
   workflow_call:
