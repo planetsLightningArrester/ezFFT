@@ -56,6 +56,9 @@ jobs:
 
       - name: Install dependencies
         run:  npm ci
+
+      - name: Generate production bundle
+        run:  npm run build
       
       - name: Run test
         run:  npm run test types
