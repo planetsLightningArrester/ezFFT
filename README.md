@@ -223,7 +223,7 @@ var io = require('socket.io')(http);
 /*Socket configuration*/
 io.on('connection', function (socket) {
     
-    console.log("LESGO");
+    console.log("LES'GO");
 
     setInterval(function () {
         let signal = [];        // Array with the Y axis (amplitude in time)
