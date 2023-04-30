@@ -1,0 +1,16 @@
+{
+  "cSpell.enableFiletypes": [
+    "github-actions-workflow"
+  ],
+  "cSpell.words": [
+    "Bluestein",
+    "ezfft",
+    "IDFT",
+    "ifft",
+    "imag",
+    "Nayuki",
+    "pipefail",
+    "rgba",
+    "Tukey"
+  ]
+}
