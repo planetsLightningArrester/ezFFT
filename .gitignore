@@ -1,5 +1,6 @@
 node_modules
 sandbox
+dist/**/*
 src/**/*.js
 !src/golden.js
 !src/tests/*
